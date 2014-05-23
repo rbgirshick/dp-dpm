@@ -24,11 +24,13 @@ if isempty(G_STARTUP)
           'car_grammar', 'person_grammar', ...
           'model', 'features', 'vis', ...
           'data', 'train', 'test', ...
-          'external', 'star-cascade'};
+          'external', 'star-cascade', 'external/caffe/matlab/caffe'};
   for i = 1:length(incl)
-    addpath(genpath(incl{i}));
+    addpath(incl{i});
   end
   conf = voc_config();
   fprintf('%s is set up\n', conf.version);
   clear conf i incl;
 end
+
+addpath(genpath('external/minConf'));

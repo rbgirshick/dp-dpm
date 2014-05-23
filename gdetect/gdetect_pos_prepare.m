@@ -27,7 +27,7 @@ function [pyra, model_dp] = gdetect_pos_prepare(im, model, boxes, fg_overlap)
 % -------------------------------------------------------
 
 % get feature pyramid
-pyra = featpyramid(im, model);
+pyra = cnn_feat_pyramid(im, model);
 
 % mark valid levels (skip levels that don't have sufficient
 % overlap with any box in boxes

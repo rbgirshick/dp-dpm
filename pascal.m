@@ -59,7 +59,7 @@ diary(conf.training.log([cls '-' timestamp]));
 
 % Train a model (and record how long it took)
 th = tic;
-model = pascal_train(cls, n, note);
+model = pascal_train_d_and_t(cls, note);
 toc(th);
 
 % Free the feature vector cache memory
@@ -71,6 +71,7 @@ model.interval = conf.eval.interval;
 
 suffix = testyear;
 
+model = model_cnn_init(model);
 % Collect detections on the test set
 ds = pascal_test(model, testset, testyear, suffix);
 

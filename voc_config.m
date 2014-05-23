@@ -40,7 +40,7 @@ PASCAL_YEAR = '2007';
 
 % Models are stored in BASE_DIR/PROJECT/PASCAL_YEAR/
 % e.g., /var/tmp/rbg/voc-release5/2007/
-PROJECT     = 'voc-dpm-bugfixes7';
+PROJECT     = 'dpm-cnn-features/scaled_50';
 
 % The code will look for your PASCAL VOC devkit in 
 % BASE_DIR/VOC<PASCAL_YEAR>/VOCdevkit
@@ -138,7 +138,7 @@ conf = cv(conf, 'pascal.year', PASCAL_YEAR);
 conf = cv(conf, 'pascal.dev_kit', [conf.paths.base_dir '/VOC' ...
                                    conf.pascal.year '/VOCdevkit/']);
 % For INRIA person                                   
-%conf = cv(conf, 'pascal.dev_kit', [conf.paths.base_dir '/INRIA/VOCdevkit/']);
+%conf = cv(conf, 'pascal.dev_kit', [conf.paths.base_dir '/INRIA_PASCAL/VOCdevkit/']);
 
 if exist(conf.pascal.dev_kit) == 0
   global G_VOC_CONFIG_HELLO;
@@ -178,6 +178,7 @@ conf = cv(conf, 'training.train_set_fg', 'trainval');
 %conf = cv(conf, 'training.train_set_fg', 'train');
 conf = cv(conf, 'training.train_set_bg', 'train');
 conf = cv(conf, 'training.C', 0.001);
+%conf = cv(conf, 'training.C', 0.0000001);
 conf = cv(conf, 'training.bias_feature', 10);
 % File size limit for the feature vector cache (2^30 bytes = 1GB)
 conf = cv(conf, 'training.cache_byte_limit', 3*2^30);
@@ -194,14 +195,14 @@ conf = cv(conf, 'training.lbfgs.options.verbose', 2);
 conf = cv(conf, 'training.lbfgs.options.maxIter', 1000);
 conf = cv(conf, 'training.lbfgs.options.optTol', 0.000001);
 
-conf = cv(conf, 'training.interval_fg', 5);
-conf = cv(conf, 'training.interval_bg', 4);
+conf = cv(conf, 'training.interval_fg', 1);
+conf = cv(conf, 'training.interval_bg', 1);
 
 
 % -------------------------------------------------------------------
 % Evaluation configuration 
 % -------------------------------------------------------------------
-conf = cv(conf, 'eval.interval', 10);
+conf = cv(conf, 'eval.interval', 1);
 conf = cv(conf, 'eval.test_set', 'test');
 %conf = cv(conf, 'eval.test_set', 'val');
 conf = cv(conf, 'eval.max_thresh', -1.1);
@@ -211,8 +212,8 @@ conf.pascal.VOCopts.testset = conf.eval.test_set;
 % -------------------------------------------------------------------
 % Feature configuration 
 % -------------------------------------------------------------------
-conf = cv(conf, 'features.sbin', 8);
-conf = cv(conf, 'features.dim', 32);
+conf = cv(conf, 'features.sbin', 16);
+conf = cv(conf, 'features.dim', 256);
 conf = cv(conf, 'features.truncation_dim', 32);
 conf = cv(conf, 'features.extra_octave', false);
 

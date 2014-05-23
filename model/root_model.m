@@ -67,6 +67,7 @@ if nargin < 5
   % size of root filter
   sz = [round(h/model.sbin) round(w/model.sbin)];
 end
+sz = sz*2;
 
 % get an empty model
 model = model_create(cls, note);
@@ -84,5 +85,5 @@ model.start = Q;
 % loc_w = [-1000 0 0] prevents the root filter from being placed
 % in the bottom octave of the feature pyramid
 model = model_add_struct_rule(model, Q, symbol, {[0 0 0]}, ...
-                              'loc_w', [-1000 0 0], ...
+                              'loc_w', [0 0 0], ...
                               'detection_window', sz);

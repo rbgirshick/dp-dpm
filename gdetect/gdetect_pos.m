@@ -1,6 +1,7 @@
 function [ds, bs, trees] = gdetect_pos(pyra, model, count, ...
                                        fg_box, fg_overlap, ...
-                                       bg_boxes, max_bg_overlap)
+                                       bg_boxes, max_bg_overlap, ...
+                                       use_overlap_as_score)
 % Compute belief and loss adjusted detections for a foreground example.
 %   [ds, bs, trees] = gdetect_pos(pyra, model, count, ...
 %                                 fg_box, fg_overlap, ...
@@ -51,8 +52,12 @@ function [ds, bs, trees] = gdetect_pos(pyra, model, count, ...
 % your project.
 % -------------------------------------------------------
 
+if ~exist('use_overlap_as_score', 'var') || isempty(use_overlap_as_score)
+  use_overlap_as_score = false;
+end
+
 % Get the non-loss adjusted detection (termed the "belief")
-modelp = apply_L_output(model, pyra, fg_box, fg_overlap);
+modelp = apply_L_output(model, pyra, fg_box, fg_overlap, use_overlap_as_score);
 [ds, bs, trees] = gdetect_parse(modelp, pyra, -100, 1);
 
 % Get (count-1) more loss-adjusted detections
@@ -122,7 +127,7 @@ model.symbols(model.start).score = score;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Apply L_output to dynamic programming tables and recompute
 % the top scoring detection
-function model = apply_L_output(model, pyra, fg_box, overlap)
+function model = apply_L_output(model, pyra, fg_box, overlap, use_overlap_as_score)
 % model           model (augmented with DP tables from gdetect_dp.m)
 % pyra            feature pyramid
 % fg_box          selected foreground bounding box index
@@ -135,6 +140,9 @@ for i = 1:length(model.rules{model.start})
   for level = 1:length(model.rules{model.start}(i).score)
     if pyra.valid_levels(level) 
       o = pyra.overlaps(i).box(fg_box).o{level};
+      if use_overlap_as_score
+        model.rules{model.start}(i).score{level}(:) = o;
+      end
       inds = find(o < overlap);
       model.rules{model.start}(i).score{level}(inds) = -inf;
     end

@@ -53,3 +53,31 @@ m.stats.slave_problem_time = [];  % time spent in slave problem optimization
 m.stats.data_mining_time   = [];  % time spent in data mining
 m.stats.pos_latent_time    = [];  % time spent in inference on positives
 m.stats.filter_usage       = [];  % foreground training instances / filter
+
+cnn_binary_file = './data/caffe_nets/ilsvrc_2012_train_iter_310k';
+cnn_definition_file = './model-defs/rcnn_batch_7_output_pool5_plane2k.prototxt';
+
+cnn.binary_file = cnn_binary_file;
+cnn.definition_file = cnn_definition_file;
+cnn.batch_size = 256;
+cnn.init_key = -1;
+cnn.input_size = 227;
+% load the ilsvrc image mean
+data_mean_file = './external/caffe/matlab/caffe/ilsvrc_2012_mean.mat';
+assert(exist(data_mean_file, 'file') ~= 0);
+ld = load(data_mean_file);
+image_mean = ld.image_mean; clear ld;
+off = floor((size(image_mean,1) - cnn.input_size)/2)+1;
+image_mean = image_mean(off:off+cnn.input_size-1, off:off+cnn.input_size-1, :);
+cnn.image_mean = image_mean;
+mu = cnn.image_mean;
+mu = sum(sum(mu, 1), 2) / size(mu, 1) / size(mu, 2);
+cnn.mu = mu;
+
+cnn.init_key = ...
+    caffe('init', cnn.definition_file, cnn.binary_file);
+caffe('set_mode_gpu');
+caffe('set_phase_test');
+cnn.layers = caffe('get_weights');
+
+m.cnn = cnn;

@@ -22,5 +22,5 @@ function [ds, bs, trees] = imgdetect(im, model, thresh)
 % -------------------------------------------------------
 
 im = color(im);
-pyra = featpyramid(im, model);
+pyra = cnn_feat_pyramid(im, model);
 [ds, bs, trees] = gdetect(pyra, model, thresh);

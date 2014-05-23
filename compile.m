@@ -62,7 +62,7 @@ if nargin < 3
   % from 4 to 100
   % for i = 4:4:100
   %for i = [8 32]
-  for i = [32]
+  for i = [32 256]
     fprintf('Building convolution routine for %d features\n', i);
     extra_cxx_flags = sprintf('-Iexternal -DMETA_NUM_FEATURES=%d', i/4);
     eval([mexcmd(opt, verb, extra_cxx_flags) ...

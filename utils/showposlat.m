@@ -36,14 +36,15 @@ show_slabs = true;
 k = 0;
 for i = start:numpos
   fprintf('%s %s: show pos lat: %d/%d\n', procid(), model.class, i, numpos);
-  if max(pos(i).sizes) < minsize
-    fprintf('  all too small\n');
-    continue;
-  end
+%  if max(pos(i).sizes) < minsize
+%    fprintf('  all too small\n');
+%    continue;
+%  end
 
   % do image level operations
   im = color(imreadx(pos(i)));
-  [im, boxes] = croppos(im, pos(i).boxes);
+  %[im, boxes] = croppos(im, pos(i).boxes);
+  boxes = pos(i).boxes;
   [pyra, model_dp] = gdetect_pos_prepare(im, model, boxes, overlap);
   %fprintf('%s\n', pos(i).im);
 
@@ -70,11 +71,11 @@ for i = start:numpos
       end
     end
 
-    % skip small examples
-    if pos(i).sizes(b) < minsize
-      fprintf('  %d: too small\n', b);
-      continue;
-    end
+%    % skip small examples
+%    if pos(i).sizes(b) < minsize
+%      fprintf('  %d: too small\n', b);
+%      continue;
+%    end
     [det, bs, trees] = gdetect_pos(pyra, model_dp, 1+fp_count, fg_ibox, ...
                                   overlap, bg_iboxes, 0.5);
     if ~isempty(det)

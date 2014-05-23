@@ -114,37 +114,36 @@ for t = 1:iter
 
     % add new positives
     stop_relabeling = false;
+
     if warp
-      [num_entries_added, num_examples_added] ...
-          = poswarp(t, model, pos);
-      fusage = num_examples_added;
-      component_usage = num_examples_added;
+      use_overlap_as_score = true;
     else
-      th = tic();
-      [num_entries_added, num_examples_added, fusage, component_usage, scores] ...
-          = poslatent(t, iter, model, pos, fg_overlap, num_fp);
-      th = toc(th);
-      model.stats.pos_latent_time = [model.stats.pos_latent_time; th];
+      use_overlap_as_score = false;
+    end
+    th = tic();
+    [num_entries_added, num_examples_added, fusage, component_usage, scores] ...
+        = poslatent(t, iter, model, pos, fg_overlap, num_fp, use_overlap_as_score);
+    th = toc(th);
+    model.stats.pos_latent_time = [model.stats.pos_latent_time; th];
 
-      % compute hinge loss on foreground examples after relabeling
-      hinge = max(0, 1-scores);
-      pos_loss(t,2) = C*sum(hinge);
-      for tt = 1:t
-        fprintf('positive loss before: %f, after: %f, ratio: %f\n', ...
-                pos_loss(tt,1), pos_loss(tt,2), pos_loss(tt,2)/pos_loss(tt,1));
-      end
-      fprintf('Foreground latent estimation took %.4f seconds\n', th);
+    % compute hinge loss on foreground examples after relabeling
+    hinge = max(0, 1-scores);
+    pos_loss(t,2) = C*sum(hinge);
+    for tt = 1:t
+      fprintf('positive loss before: %f, after: %f, ratio: %f\n', ...
+              pos_loss(tt,1), pos_loss(tt,2), pos_loss(tt,2)/pos_loss(tt,1));
+    end
+    fprintf('Foreground latent estimation took %.4f seconds\n', th);
 
-      if t > 1 && pos_loss(t,2)*0.99999 > pos_loss(t,1)
-        fprintf('warning: pos loss went up\n');
-        keyboard;
-      end
+    if t > 1 && pos_loss(t,2)*0.99999 > pos_loss(t,1)
+      fprintf('warning: pos loss went up\n');
+      keyboard;
+    end
 
-      % stop if relabeling doesn't reduce the hinge loss on 
-      % foreground examples by much
-      if t > 1 && pos_loss(t,2)/pos_loss(t,1) > 0.999
-        stop_relabeling = true;
-      end
+    % stop if relabeling doesn't reduce the hinge loss on 
+    % foreground examples by much
+    if t > 1 && pos_loss(t,2)/pos_loss(t,1) > 0.999
+      stop_relabeling = true;
     end
     num_entries = num_entries + num_entries_added;
     num_examples = num_examples + num_examples_added;
@@ -458,49 +457,10 @@ for t = 1:iter
 end
 
 
-% get positive examples by warping positive bounding boxes
-% we create virtual examples by flipping each image left to right
-function [num_entries, num_examples] = poswarp(t, model, pos)
-% assumption: the model only has a single structure rule 
-% of the form Q -> F.
-numpos = length(pos);
-warped = warppos(model, pos);
-fi = model.symbols(model.rules{model.start}.rhs).filter;
-fbl = model.filters(fi).blocklabel;
-obl = model.rules{model.start}.offset.blocklabel;
-pixels = model.filters(fi).size * model.sbin / 2;
-minsize = prod(pixels);
-num_entries = 0;
-num_examples = 0;
-is_belief = 1;
-is_mined = 0;
-loss = 0;
-for i = 1:numpos
-  fprintf('%s %s: iter %d: warped positive: %d/%d\n', ...
-          procid(), model.class, t, i, numpos);
-  bbox = [pos(i).x1 pos(i).y1 pos(i).x2 pos(i).y2];
-  % skip small examples
-  if (bbox(3)-bbox(1)+1)*(bbox(4)-bbox(2)+1) < minsize
-    continue;
-  end    
-  % get example
-  im = warped{i};
-  feat = features(double(im), model.sbin);
-  key = [i 0 0 0];
-  bls = [obl; fbl] - 1;
-  feat = [model.features.bias; feat(:)];
-  fv_cache('add', int32(key), int32(bls), single(feat), ...
-                  int32(is_belief), int32(is_mined), loss); 
-  write_zero_fv(true, key);
-  num_entries = num_entries + 2;
-  num_examples = num_examples + 1;
-end
-
-
 % get positive examples using latent detections
 % we create virtual examples by flipping each image left to right
 function [num_entries, num_examples, fusage, component_usage, scores] ...
-  = poslatent(t, iter, model, pos, fg_overlap, num_fp)
+  = poslatent(t, iter, model, pos, fg_overlap, num_fp, use_overlap_as_score)
 conf = voc_config();
 model.interval = conf.training.interval_fg;
 numpos = length(pos);
@@ -520,16 +480,17 @@ for i = 1:batchsize:numpos
   clear('data');
   empties = cell(1, thisbatchsize);
   data = struct('boxdata', empties, 'pyra', empties);
-  parfor k = 1:thisbatchsize
+  %parfor k = 1:thisbatchsize
+  for k = 1:thisbatchsize
     j = i+k-1;
     msg = sprintf('%s %s: iter %d/%d: latent positive: %d/%d', ...
                   procid(), model.class, t, iter, j, numpos);
-    % skip small examples
-    if max(pos(j).sizes) < minsize
-      data(k).boxdata = cell(length(pos(j).sizes), 1);
-      fprintf('%s (all too small)\n', msg);
-      continue;
-    end
+%    % skip small examples
+%    if max(pos(j).sizes) < minsize
+%      data(k).boxdata = cell(length(pos(j).sizes), 1);
+%      fprintf('%s (all too small)\n', msg);
+%      continue;
+%    end
 
     % do whole image operations
     im = color(imreadx(pos(j)));
@@ -541,22 +502,27 @@ for i = 1:batchsize:numpos
     num_boxes = size(boxes, 1);
     for b = 1:num_boxes
       % skip small examples
-      if pos(j).sizes(b) < minsize
-        data(k).boxdata{b} = [];
-        fprintf('%s (%d: too small)\n', msg, b);
-        continue;
-      end
+%      if pos(j).sizes(b) < minsize
+%        data(k).boxdata{b} = [];
+%        fprintf('%s (%d: too small)\n', msg, b);
+%        continue;
+%      end
       fg_box = b;
       bg_boxes = 1:num_boxes;
       bg_boxes(b) = [];
       [ds, bs, trees] = gdetect_pos(data(k).pyra, model_dp, 1+num_fp, ...
-                                    fg_box, fg_overlap, bg_boxes, 0.5);
+                                    fg_box, fg_overlap, bg_boxes, 0.5, ...
+                                    use_overlap_as_score);
       data(k).boxdata{b}.bs = bs;
       data(k).boxdata{b}.trees = trees;
       if ~isempty(bs)
         fprintf('%s (%d: comp %d  score %.3f)\n', msg, b, bs(1,end-1), bs(1,end));
+        %showboxes(im, ds);
+        %pause;
       else
         fprintf('%s (%d: no overlap)\n', msg, b);
+        %showboxes(im, ds);
+        %pause;
       end
     end
     model_dp = [];
@@ -605,13 +571,29 @@ for i = 1:batchsize:numneg
   thisbatchsize = batchsize - max(0, (i+batchsize-1) - numneg);
   det_limit = ceil((max_num_examples - num_examples) / thisbatchsize);
   data = cell(thisbatchsize, 1);
-  parfor k = 1:thisbatchsize
+  %parfor k = 1:thisbatchsize
+  for k = 1:thisbatchsize
     j = inds(i+k-1);
     fprintf('%s %s: iter %d/%d: hard negatives: %d/%d (%d)\n', ...
             procid(), model.class, t, negiter, i+k-1, numneg, j);
     im = color(imreadx(neg(j)));
-    pyra = featpyramid(im, model);
+    pyra = cnn_feat_pyramid(im, model);
     [ds, bs, trees] = gdetect(pyra, model, -1.002, det_limit);
+    % remove detections that overlap with ground-truth boxes by more than 0.3
+    if isfield(neg(j), 'boxes')
+      if ~isempty(neg(j).boxes) && ~isempty(ds)
+        del = [];
+        for jj = 1:size(neg(j).boxes, 1)
+          ovr = boxoverlap(ds, neg(j).boxes(jj, :));
+          I = find(ovr > 0.3);
+          del = cat(1, del, I);
+        end
+        del = unique(del);
+        ds(del, :) = [];
+        bs(del, :) = [];
+        trees(del) = [];
+      end
+    end
     data{k}.bs = bs;
     data{k}.pyra = pyra;
     data{k}.trees = trees;
@@ -661,11 +643,13 @@ num_examples = 0;
 is_belief = 0;
 is_mined = 1;
 loss = 1;
-for i = 1:numneg
+max_neg = min(10, length(numneg));
+for i = 1:max_neg
   tic_toc_print('%s %s: iter %d: random negatives: %d/%d\n', ...
-                procid(), model.class, t, i, numneg);
+                procid(), model.class, t, i, max_neg);
   im = imreadx(neg(i));
-  feat = features(double(im), model.sbin);  
+  pyra = cnn_feat_pyramid(im, model, 0, 0);
+  feat = pyra.feat{1};
   if size(feat,2) > rsize(2) && size(feat,1) > rsize(1)
     for j = 1:rndneg
       x = random('unid', size(feat,2)-rsize(2)+1);
