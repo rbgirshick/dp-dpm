@@ -1,4 +1,4 @@
-function [ds, bs, trees] = imgdetect(im, model, thresh)
+function [ds, bs, trees] = imgdetect(im, model, thresh, image_id)
 % Wrapper around gdetect.m that computes detections in an image.
 %   [ds, bs, trees] = imgdetect(im, model, thresh)
 %
@@ -21,6 +21,10 @@ function [ds, bs, trees] = imgdetect(im, model, thresh)
 % your project.
 % -------------------------------------------------------
 
+if ~exist('image_id', 'var')
+  image_id = [];
+end
+
 im = color(im);
-pyra = cnn_feat_pyramid(im, model);
+pyra = cnn_feat_pyramid(im, model, [], [], image_id);
 [ds, bs, trees] = gdetect(pyra, model, thresh);

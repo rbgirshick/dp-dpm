@@ -60,7 +60,7 @@ catch
     else
       im = imread(sprintf(opts.imgpath, ids{i}));  
     end
-    [ds, bs] = imgdetect(im, model, model.thresh);
+    [ds, bs] = imgdetect(im, model, model.thresh, ids{i});
     if ~isempty(bs)
       unclipped_ds = ds(:,1:4);
       [ds, bs, rm] = clipboxes(im, ds, bs);

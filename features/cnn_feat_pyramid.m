@@ -1,4 +1,14 @@
-function pyra = cnn_feat_pyramid(im, model, padx, pady)
+function pyra = cnn_feat_pyramid(im, model, padx, pady, image_id)
+
+if exist('image_id', 'var') && ~isempty(image_id)
+  % TODO: fix outdir year hardcoding
+  outdir = '/data1/cnn_feat_pyra_cache';
+  year = '2007';
+  cache_file = [outdir '/VOC' year '/' image_id '.mat'];
+  ld = load(cache_file);
+  pyra = ld.pyra;
+  return;
+end
 
 num_levels = 7;
 
@@ -8,7 +18,8 @@ imsize = [size(im, 1) size(im, 2)];
 pyra.imsize = imsize;
 pyra.num_levels = length(pyra.feat);
 
-if nargin < 3
+if ~exist('padx', 'var') || isempty(padx) || ...
+   ~exist('pady', 'var') || isempty(pady)
   [padx, pady] = getpadding(model);
 end
 

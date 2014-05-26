@@ -495,7 +495,10 @@ for i = 1:batchsize:numpos
     % do whole image operations
     im = color(imreadx(pos(j)));
     [im, boxes] = croppos(im, pos(j).boxes);
-    [pyra, model_dp] = gdetect_pos_prepare(im, model, boxes, fg_overlap);
+    %boxes = pos(j).boxes;
+    %[~, image_id] = fileparts(pos(j).im);
+    image_id = [];
+    [pyra, model_dp] = gdetect_pos_prepare(im, model, boxes, fg_overlap, image_id);
     data(k).pyra = pyra;
 
     % process each box in the image
@@ -577,7 +580,8 @@ for i = 1:batchsize:numneg
     fprintf('%s %s: iter %d/%d: hard negatives: %d/%d (%d)\n', ...
             procid(), model.class, t, negiter, i+k-1, numneg, j);
     im = color(imreadx(neg(j)));
-    pyra = cnn_feat_pyramid(im, model);
+    [~, image_id] = fileparts(neg(j).im);
+    pyra = cnn_feat_pyramid(im, model, [], [], image_id);
     [ds, bs, trees] = gdetect(pyra, model, -1.002, det_limit);
     % remove detections that overlap with ground-truth boxes by more than 0.3
     if isfield(neg(j), 'boxes')

@@ -1,4 +1,4 @@
-function [pyra, model_dp] = gdetect_pos_prepare(im, model, boxes, fg_overlap)
+function [pyra, model_dp] = gdetect_pos_prepare(im, model, boxes, fg_overlap, image_id)
 % Prepare a set of foreground examples in the same image for processing
 % with gdetect_pos.m.
 %   [pyra, model_dp] = gdetect_pos_prepare(im, model, boxes, fg_overlap)
@@ -27,7 +27,11 @@ function [pyra, model_dp] = gdetect_pos_prepare(im, model, boxes, fg_overlap)
 % -------------------------------------------------------
 
 % get feature pyramid
-pyra = cnn_feat_pyramid(im, model);
+if ~exist('image_id', 'var')
+  image_id = [];
+end
+
+pyra = cnn_feat_pyramid(im, model, [], [], image_id);
 
 % mark valid levels (skip levels that don't have sufficient
 % overlap with any box in boxes

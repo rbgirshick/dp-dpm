@@ -59,7 +59,8 @@ diary(conf.training.log([cls '-' timestamp]));
 
 % Train a model (and record how long it took)
 th = tic;
-model = pascal_train_d_and_t(cls, note);
+%model = pascal_train_d_and_t(cls, note);
+model = pascal_train_mixture(cls, n, note);
 toc(th);
 
 % Free the feature vector cache memory
@@ -79,12 +80,12 @@ ds = pascal_test(model, testset, testyear, suffix);
 ap1 = pascal_eval(cls, ds, testset, testyear, suffix);
 fprintf('AP = %.4f (without bounding box prediction)\n', ap1)
 
-% Recompute AP after applying bounding box prediction
-[ap1, ap2] = bboxpred_rescore(cls, testset, testyear, suffix);
-fprintf('AP = %.4f (without bounding box prediction)\n', ap1)
-fprintf('AP = %.4f (with bounding box prediction)\n', ap2)
-
-% Compute detections on the trainval dataset (used for context rescoring)
-if dotrainval
-  trainval(cls);
-end
+%% Recompute AP after applying bounding box prediction
+%[ap1, ap2] = bboxpred_rescore(cls, testset, testyear, suffix);
+%fprintf('AP = %.4f (without bounding box prediction)\n', ap1)
+%fprintf('AP = %.4f (with bounding box prediction)\n', ap2)
+%
+%% Compute detections on the trainval dataset (used for context rescoring)
+%if dotrainval
+%  trainval(cls);
+%end
