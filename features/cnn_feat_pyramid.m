@@ -42,12 +42,14 @@ batch_height = 1723;
 sz_w = (batch_width-11)/16+1;
 sz_h = sz_w;
 %th = tic;
-[batch, scales, level_sizes] = prepare_image(im, cnn_model, batch_height, batch_width, num_levels);
+[batch, scales, level_sizes] = ...
+    prepare_image(im, cnn_model, batch_height, batch_width, num_levels);
 %fprintf('prep: %.3fs\n', toc(th));
 
 %th = tic;
 feat = caffe('forward', {batch});
-feat_pyra = permute(reshape(feat{1}, [sz_w sz_h 256 num_levels]), [2 1 3 4]);
+feat_pyra = ...
+    permute(reshape(feat{1}, [sz_w sz_h 256 num_levels]), [2 1 3 4]);
 %fprintf('fwd: %.3fs\n', toc(th));
 
 for i = 1:num_levels
@@ -56,7 +58,8 @@ for i = 1:num_levels
 end
 
 % ------------------------------------------------------------------------
-function [batch, scales, level_sizes] = prepare_image(im, cnn_model, batch_height, batch_width, num_levels)
+function [batch, scales, level_sizes] = ...
+    prepare_image(im, cnn_model, batch_height, batch_width, num_levels)
 % ------------------------------------------------------------------------
 im = single(im);
 % Convert to BGR
