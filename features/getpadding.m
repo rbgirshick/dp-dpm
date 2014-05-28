@@ -24,5 +24,5 @@ function [padx, pady] = getpadding(model)
 % -------------------------------------------------------
 
 % Use the dimensions of the max over detection windows
-padx = ceil(model.maxsize(2));
-pady = ceil(model.maxsize(1));
+padx = 10;
+pady = 10;
