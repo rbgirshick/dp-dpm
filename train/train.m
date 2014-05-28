@@ -160,6 +160,15 @@ for t = 1:iter
       fprintf('  component %d got %d/%d (%.2f%%) examples\n', ...
               i, component_usage(i), num_examples_added, ...
               100*component_usage(i)/num_examples_added);
+
+      % if a component got zero positive examples, disable it by
+      % setting its bias to -1000 and turning off bias learning
+      if component_usage(i) == 0
+        fprintf('  !!! Disabling component %d (zero positive examples)\n', i);
+        o_bl = model.rules{model.start}(i).offset.blocklabel;
+        model.blocks(o_bl).learn = 0;
+        model.blocks(o_bl).w = -1000 / model.features.bias;
+      end
     end
 
     if stop_relabeling
@@ -494,10 +503,13 @@ for i = 1:batchsize:numpos
 
     % do whole image operations
     im = color(imreadx(pos(j)));
-    [im, boxes] = croppos(im, pos(j).boxes);
-    %boxes = pos(j).boxes;
-    %[~, image_id] = fileparts(pos(j).im);
-    image_id = [];
+    %[im, boxes] = croppos(im, pos(j).boxes);
+    %image_id = [];
+    boxes = pos(j).boxes;
+    [~, image_id] = fileparts(pos(j).im);
+    if pos(j).flip
+      image_id = [image_id '_flipped'];
+    end
     [pyra, model_dp] = gdetect_pos_prepare(im, model, boxes, fg_overlap, image_id);
     data(k).pyra = pyra;
 

@@ -142,6 +142,10 @@ for i = 1:length(model.rules{model.start})
       o = pyra.overlaps(i).box(fg_box).o{level};
       if use_overlap_as_score
         model.rules{model.start}(i).score{level}(:) = o;
+        % prevent filter from being placed where it would go outside of the
+        % feature map
+        model.rules{model.start}(i).score{level}(:, end-detwin(2)+1:end) = -inf;
+        model.rules{model.start}(i).score{level}(end-detwin(1)+1:end, :) = -inf;
       end
       inds = find(o < overlap);
       model.rules{model.start}(i).score{level}(inds) = -inf;
