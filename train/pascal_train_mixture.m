@@ -40,25 +40,77 @@ num_neg   = length(neg);
 neg_large = neg; % use all of the negative images
 neg_perm  = neg(randperm(num_neg));
 neg_small = neg_perm(1:min(num_neg, conf.training.num_negatives_small));
-%neg_small = pos;
 
-%for i = 1:length(pos)
-%  neg_small(i).dataid = neg_small(i).dataids + 100000;
-%end
+impos_with_difficult = pascal_data_diff(cls, conf.pascal.year);
+neg_all = merge_pos_neg(impos_with_difficult, neg);
 
 for i = 1:n
   models{i} = root_model(cls, spos{i}, note);
 end
 model = model_merge(models);
 
-save_file = [cachedir cls '_final'];
+save_file = [cachedir cls '_hard_neg1'];
 try
   load(save_file);
+  fprintf('Loaded %s\n', save_file);
 catch
   model = model_cnn_init(model);
   model = train(model, impos, neg_small, true, false, 1, 10, ...
                 max_num_examples, fg_overlap, num_fp, false, 'hard_neg1');
-  model = train(model, impos, neg, false, false, 1, 10, ...
+  save(save_file);
+end
+
+save_file = [cachedir cls '_final'];
+try
+  load(save_file);
+  fprintf('Loaded %s\n', save_file);
+catch
+  model = model_cnn_init(model);
+  model = train(model, impos, neg_all, false, false, 1, 10, ...
                 max_num_examples, fg_overlap, num_fp, false, 'hard_neg2');
   save(save_file);
 end
+
+
+
+% ------------------------------------------------------------------------
+function all_neg = merge_pos_neg(pos, neg)
+% ------------------------------------------------------------------------
+% neg fields
+%    im
+%    flip
+%    dataid
+%    +boxes
+% pos fields
+%     im
+%     flip
+%     +dataid
+%     boxes
+%     -x1
+%     -y1
+%     -x2
+%     -y2
+%     -trunc
+%     -dataids
+%     -sizes
+
+%pos = rmfield(pos, 'x1');
+%pos = rmfield(pos, 'x2');
+%pos = rmfield(pos, 'y1');
+%pos = rmfield(pos, 'y2');
+%pos = rmfield(pos, 'trunc');
+pos = rmfield(pos, 'sizes');
+pos = rmfield(pos, 'dataids');
+
+% remove flipped examples (they are not currently cached)
+is_flipped = find([pos(:).flip] == true);
+pos(is_flipped) = [];
+
+neg(1).boxes = [];
+
+last_neg_dataid = max([neg(:).dataid]);
+for i = 1:length(pos)
+  pos(i).dataid = last_neg_dataid + i;
+end
+
+all_neg = cat(2, pos, neg);

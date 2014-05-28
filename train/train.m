@@ -519,7 +519,12 @@ for i = 1:batchsize:numpos
       data(k).boxdata{b}.bs = bs;
       data(k).boxdata{b}.trees = trees;
       if ~isempty(bs)
-        fprintf('%s (%d: comp %d  score %.3f)\n', msg, b, bs(1,end-1), bs(1,end));
+        if use_overlap_as_score
+          word = 'overlap';
+        else
+          word = 'score';
+        end
+        fprintf('%s (%d: comp %d  %s %.3f)\n', msg, b, bs(1,end-1), word, bs(1,end));
         %showboxes(im, ds);
         %pause;
       else
@@ -591,6 +596,9 @@ for i = 1:batchsize:numneg
           ovr = boxoverlap(ds, neg(j).boxes(jj, :));
           I = find(ovr > 0.3);
           del = cat(1, del, I);
+          %subplot(1,2,1); showboxes(im, neg(j).boxes(jj, :));
+          %subplot(1,2,2); showboxes(im, ds(I,:));
+          %pause;
         end
         del = unique(del);
         ds(del, :) = [];
