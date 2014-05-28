@@ -78,6 +78,5 @@ cnn.init_key = ...
     caffe('init', cnn.definition_file, cnn.binary_file);
 caffe('set_mode_gpu');
 caffe('set_phase_test');
-cnn.layers = caffe('get_weights');
 
 m.cnn = cnn;

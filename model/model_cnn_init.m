@@ -12,4 +12,3 @@ else
   caffe('set_mode_cpu');
 end
 caffe('set_phase_test');
-m.cnn.layers = caffe('get_weights');
