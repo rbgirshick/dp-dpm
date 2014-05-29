@@ -67,7 +67,7 @@ catch
       unclipped_ds(rm,:) = [];
 
       % NMS
-      I = nms(ds, 0.5);
+      I = nms_iou(ds, 0.3);
       ds = ds(I,:);
       bs = bs(I,:);
       unclipped_ds = unclipped_ds(I,:);
