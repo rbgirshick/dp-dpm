@@ -112,13 +112,13 @@ for i = start:numpos
       tree = [];
     end
 
-    subplot(1,2,1);
+    %subplot(1,2,1);
     showboxesc(im, boxesc);
     title('green = fg box;  blue = bg boxes;  red = loss adjusted boxes;  cyan = label completed detection');
-    subplot(1,2,2);
-    if ~isempty(tree)
-      vis_derived_filter(model, tree);
-    end
+    %subplot(1,2,2);
+    %if ~isempty(tree)
+    %  vis_derived_filter(model, tree);
+    %end
 
     pause;
   end
