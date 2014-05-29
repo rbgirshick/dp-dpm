@@ -47,8 +47,15 @@ catch
   num_ids = length(ids);
   ds_out = cell(1, num_ids);
   bs_out = cell(1, num_ids);
+
+  max_per_set = 30000;
+  max_per_image = 100;
+  top_scores = [];
+  thresh = -1.5;
+  box_counts = 0;
+
   th = tic();
-  parfor i = 1:num_ids;
+  for i = 1:num_ids;
     fprintf('%s: testing: %s %s, %d/%d\n', cls, testset, year, ...
             i, num_ids);
     if strcmp('inriaperson', cls)
@@ -60,7 +67,7 @@ catch
     else
       im = imread(sprintf(opts.imgpath, ids{i}));  
     end
-    [ds, bs] = imgdetect(im, model, model.thresh, ids{i});
+    [ds, bs] = imgdetect(im, model, thresh, ids{i});
     if ~isempty(bs)
       unclipped_ds = ds(:,1:4);
       [ds, bs, rm] = clipboxes(im, ds, bs);
@@ -91,11 +98,39 @@ catch
       ds_out{i} = [];
       bs_out{i} = [];
     end
+
+    if mod(i, 1000) == 0
+      [bs_out, ds_out, thresh] = ...
+           keep_top_k(bs_out, ds_out, i, max_per_set, thresh);
+    end
   end
   th = toc(th);
+
+  [bs_out, ds_out, thresh] = ...
+      keep_top_k(bs_out, ds_out, i, max_per_set, thresh);
+
   ds = ds_out;
   bs = bs_out;
   save([cachedir cls '_boxes_' testset '_' suffix], ...
        'ds', 'bs', 'th');
   fprintf('Testing took %.4f seconds\n', th);
+end
+
+% ------------------------------------------------------------------------
+function [boxes, dets, thresh] = keep_top_k(boxes, dets, end_at, top_k, thresh)
+% ------------------------------------------------------------------------
+% Keep top K
+X = cat(1, boxes{1:end_at});
+if isempty(X)
+  return;
+end
+scores = sort(X(:,end), 'descend');
+thresh = scores(min(length(scores), top_k));
+for image_index = 1:end_at
+  bbox = boxes{image_index};
+  if ~isempty(bbox)
+    keep = find(bbox(:,end) >= thresh);
+    boxes{image_index} = bbox(keep,:);
+    dets{image_index} = dets{image_index}(keep,:);
+  end
 end
