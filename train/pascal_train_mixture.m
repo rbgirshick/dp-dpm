@@ -57,7 +57,7 @@ catch
   model = model_cnn_init(model);
   model = train(model, impos, neg_small, true, false, 1, 10, ...
                 max_num_examples, fg_overlap, num_fp, false, 'hard_neg1');
-  save(save_file);
+  save(save_file, 'model');
 end
 
 save_file = [cachedir cls '_final'];
@@ -68,7 +68,7 @@ catch
   model = model_cnn_init(model);
   model = train(model, impos, neg_all, false, false, 1, 10, ...
                 max_num_examples, fg_overlap, num_fp, false, 'hard_neg2');
-  save(save_file);
+  save(save_file, 'model');
 end
 
 
