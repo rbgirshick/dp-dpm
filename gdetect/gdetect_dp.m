@@ -157,7 +157,7 @@ for i = 1:length(score)
   score{i} = score{i} + bias + loc_scores(i);
   % Bounded distance transform with +/- 4 HOG cells (9x9 window)
   [score{i}, Ix{i}, Iy{i}] = fast_bounded_dt(score{i}, def_w(1), def_w(2), ...
-                                             def_w(3), def_w(4), 4);
+                                             def_w(3), def_w(4), 2);
   % Unbounded distance transform
   %[score{i}, Ix{i}, Iy{i}] = dt(score{i}, def_w(1), def_w(2), ...
   %                              def_w(3), def_w(4));
