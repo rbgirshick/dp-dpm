@@ -74,9 +74,11 @@ mu = cnn.image_mean;
 mu = sum(sum(mu, 1), 2) / size(mu, 1) / size(mu, 2);
 cnn.mu = mu;
 
-cnn.init_key = ...
-    caffe('init', cnn.definition_file, cnn.binary_file);
-caffe('set_mode_gpu');
-caffe('set_phase_test');
+if 0
+  cnn.init_key = ...
+      caffe('init', cnn.definition_file, cnn.binary_file);
+  caffe('set_mode_gpu');
+  caffe('set_phase_test');
+end
 
 m.cnn = cnn;
