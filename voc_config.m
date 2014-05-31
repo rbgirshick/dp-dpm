@@ -40,7 +40,7 @@ PASCAL_YEAR = '2007';
 
 % Models are stored in BASE_DIR/PROJECT/PASCAL_YEAR/
 % e.g., /var/tmp/rbg/voc-release5/2007/
-PROJECT     = 'dpm-cnn-features/scaled_50';
+PROJECT     = 'dpm-cnn-features/mix_3_neg_pos_ovr_30';
 
 % The code will look for your PASCAL VOC devkit in 
 % BASE_DIR/VOC<PASCAL_YEAR>/VOCdevkit
@@ -181,7 +181,7 @@ conf = cv(conf, 'training.C', 0.001);
 %conf = cv(conf, 'training.C', 0.0000001);
 conf = cv(conf, 'training.bias_feature', 10);
 % File size limit for the feature vector cache (2^30 bytes = 1GB)
-conf = cv(conf, 'training.cache_byte_limit', 3*2^30);
+conf = cv(conf, 'training.cache_byte_limit', 6*2^30);
 % Location of training log (matlab diary)
 conf.training.log = @(x) sprintf([conf.paths.model_dir '%s.log'], x);
 

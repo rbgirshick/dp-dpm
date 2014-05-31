@@ -137,7 +137,7 @@ for t = 1:iter
 
     if t > 1 && pos_loss(t,2)*0.99999 > pos_loss(t,1)
       fprintf('warning: pos loss went up\n');
-      keyboard;
+      %keyboard;
     end
 
     % stop if relabeling doesn't reduce the hinge loss on 
@@ -171,9 +171,9 @@ for t = 1:iter
       end
     end
 
-    if stop_relabeling
-      break;
-    end
+%    if stop_relabeling
+%      break;
+%    end
   end
   
   % Data mine background examples

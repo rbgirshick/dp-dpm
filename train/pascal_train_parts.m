@@ -80,18 +80,18 @@ catch
     % Filter to interoplate parts from
     filterind = i;
     model = model_add_parts_no_mirror_sharing(model, model.start, ruleind, ...
-                                              filterind, 2, [3 3], 0);
+                                              filterind, 4, [3 3], 0);
 %    % Enable learning location/scale prior
 %    bl = model.rules{model.start}(i).loc.blocklabel;
 %    model.blocks(bl).w(:)     = 0;
 %    model.blocks(bl).learn    = 1;
 %    model.blocks(bl).reg_mult = 1;
   end
-keyboard
+
   model = train(model, impos, neg_small, false, false, 2, 20, ...
-                max_num_examples, fg_overlap, num_fp, false, 'hard_parts');
+                max_num_examples, fg_overlap, num_fp, false, 'hard_parts1');
   model = train(model, impos, neg_all, false, false, 1, 10, ...
-                max_num_examples, fg_overlap, num_fp, true, 'hard_parts');
+                max_num_examples, fg_overlap, num_fp, true, 'hard_parts2');
 
   save(save_file, 'model');
 end
