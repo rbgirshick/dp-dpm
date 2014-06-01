@@ -29,6 +29,9 @@ function pascal(cls, n, note, dotrainval, testyear)
 
 startup;
 
+%global VOC_CONFIG_OVERRIDE;
+%VOC_CONFIG_OVERRIDE = @voc_config_new_exp;
+
 conf = voc_config();
 cachedir = conf.paths.model_dir;
 testset = conf.eval.test_set;
