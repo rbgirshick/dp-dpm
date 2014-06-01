@@ -35,15 +35,15 @@ for i=1:length(conf.pascal.VOCopts.classes)
     end
     if showcls
       if do_auc_ap
-        fprintf('%12s %.3f %.3f\n', cls, ap1, ap2);
+        fprintf('%12s %.4f %.4f\n', cls, ap1, ap2);
       else
-        fprintf('%12s %.3f\n', cls, ap1);
+        fprintf('%12s %.4f\n', cls, ap1);
       end
     else
       if do_auc_ap
-        fprintf('%.3f %.3f\n', ap1);
+        fprintf('%.4f %.4f\n', ap1);
       else
-        fprintf('%.3f\n', ap1);
+        fprintf('%.4f\n', ap1);
       end
     end
     score1(i) = ap1;
@@ -65,14 +65,14 @@ end
 if showcls
   fprintf('%s\n', repmat('-', [1 12]));
   if do_auc_ap
-    fprintf('%12s %.3f %.3f\n', 'mAP', a1, a2);
+    fprintf('%12s %.4f %.4f\n', 'mAP', a1, a2);
   else
-    fprintf('%12s %.3f\n', 'mAP', a1);
+    fprintf('%12s %.4f\n', 'mAP', a1);
   end
 else
   if do_auc_ap
-    fprintf('%.3f %.3f\n', a1, a2);
+    fprintf('%.4f %.4f\n', a1, a2);
   else
-    fprintf('%.3f\n', a1);
+    fprintf('%.4f\n', a1);
   end
 end

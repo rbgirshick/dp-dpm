@@ -65,7 +65,6 @@ end
 
 save_file = [cachedir cls '_final'];
 try
-  error
   ld = load(save_file);
   model = ld.model; clear ld;
   fprintf('Loaded %s\n', save_file);
@@ -88,53 +87,10 @@ catch
 %    model.blocks(bl).reg_mult = 1;
   end
 
-  model = train(model, impos, neg_small, false, false, 2, 20, ...
+  model = train(model, impos, neg_small, false, false, 3, 20, ...
                 max_num_examples, fg_overlap, num_fp, false, 'hard_parts1');
   model = train(model, impos, neg_all, false, false, 1, 10, ...
                 max_num_examples, fg_overlap, num_fp, true, 'hard_parts2');
 
   save(save_file, 'model');
 end
-
-
-% ------------------------------------------------------------------------
-function all_neg = merge_pos_neg(pos, neg)
-% ------------------------------------------------------------------------
-% neg fields
-%    im
-%    flip
-%    dataid
-%    +boxes
-% pos fields
-%     im
-%     flip
-%     +dataid
-%     boxes
-%     -x1
-%     -y1
-%     -x2
-%     -y2
-%     -trunc
-%     -dataids
-%     -sizes
-
-%pos = rmfield(pos, 'x1');
-%pos = rmfield(pos, 'x2');
-%pos = rmfield(pos, 'y1');
-%pos = rmfield(pos, 'y2');
-%pos = rmfield(pos, 'trunc');
-pos = rmfield(pos, 'sizes');
-pos = rmfield(pos, 'dataids');
-
-% remove flipped examples (they are not currently cached)
-is_flipped = find([pos(:).flip] == true);
-pos(is_flipped) = [];
-
-neg(1).boxes = [];
-
-last_neg_dataid = max([neg(:).dataid]);
-for i = 1:length(pos)
-  pos(i).dataid = last_neg_dataid + i;
-end
-
-all_neg = cat(2, pos, neg);
