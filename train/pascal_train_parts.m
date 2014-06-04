@@ -79,7 +79,7 @@ catch
     % Filter to interoplate parts from
     filterind = i;
     model = model_add_parts_no_mirror_sharing(model, model.start, ruleind, ...
-                                              filterind, 4, [3 3], 0);
+                                              filterind, 8, [3 3], 0);
 %    % Enable learning location/scale prior
 %    bl = model.rules{model.start}(i).loc.blocklabel;
 %    model.blocks(bl).w(:)     = 0;
