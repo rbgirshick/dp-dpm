@@ -1,4 +1,4 @@
-function m = model_create(cls, note)
+function m = model_create(cls, note, init_caffe)
 % Create an empty object model.
 %   m = model_create(cls, note)
 %
@@ -23,8 +23,12 @@ function m = model_create(cls, note)
 
 conf = voc_config();
 
-if nargin < 2
+if ~exist('note', 'var') || isempty(note)
   note = '';
+end
+
+if ~exist('init_caffe', 'var') || isempty(init_caffe)
+  init_caffe = false;
 end
 
 m.class         = cls;                % object class/category
@@ -74,7 +78,7 @@ mu = cnn.image_mean;
 mu = sum(sum(mu, 1), 2) / size(mu, 1) / size(mu, 2);
 cnn.mu = mu;
 
-if 0
+if init_caffe
   cnn.init_key = ...
       caffe('init', cnn.definition_file, cnn.binary_file);
   caffe('set_mode_gpu');
