@@ -11,7 +11,7 @@ ids = cat(1, ids, textread(sprintf(VOCopts.imgsetpath, 'test'), '%s'));
 
 padx = 10;
 pady = 10;
-model = model_create('dummy');
+model = model_create('dummy', [], true);
 
 for i = 1:length(ids)
   fprintf('%d/%d\n', i, length(ids));
