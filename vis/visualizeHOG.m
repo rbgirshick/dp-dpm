@@ -1,4 +1,4 @@
-function visualizeHOG(w)
+function im = visualizeHOG(w, buff, bs)
 % Visualize HOG features/weights.
 %   visualizeHOG(w)
 
@@ -17,14 +17,18 @@ function visualizeHOG(w)
 % -------------------------------------------------------
 
 % Make pictures of positive and negative weights
-bs = 20;
+if ~exist('bs', 'var') || isempty(bs)
+  bs = 20;
+end
 w = w(:,:,1:9);
 scale = max(max(w(:)),max(-w(:)));
 pos = HOGpicture(w, bs) * 255/scale;
 neg = HOGpicture(-w, bs) * 255/scale;
 
 % Put pictures together and draw
-buff = 10;
+if ~exist('buff', 'var') || isempty(buff)
+  buff = 10;
+end
 pos = padarray(pos, [buff buff], 128, 'both');
 if min(w(:)) < 0
   neg = padarray(neg, [buff buff], 128, 'both');
@@ -32,7 +36,9 @@ if min(w(:)) < 0
 else
   im = uint8(pos);
 end
-imagesc(im); 
-colormap gray;
-axis equal;
-axis off;
+if nargout == 0
+  imagesc(im); 
+  colormap gray;
+  axis equal;
+  axis off;
+end
