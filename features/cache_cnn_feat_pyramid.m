@@ -1,5 +1,5 @@
 function cache_cnn_feat_pyramid(year, outdir)
-% cache_cnn_feat_pyramid('2007', '/data1/cnn_feat_pyra_cache');
+% cache_cnn_feat_pyramid('2007', '/data/caches/dp-dpm');
 
 conf = voc_config('pascal.year', year);
 VOCopts  = conf.pascal.VOCopts;
@@ -9,8 +9,6 @@ ids = textread(sprintf(VOCopts.imgsetpath, 'trainval'), '%s');
 num_in_trainval = length(ids);
 ids = cat(1, ids, textread(sprintf(VOCopts.imgsetpath, 'test'), '%s'));
 
-padx = 10;
-pady = 10;
 model = model_create('dummy', [], true);
 
 for i = 1:length(ids)
@@ -19,8 +17,8 @@ for i = 1:length(ids)
   cache_file = [outdir '/VOC' year '/' ids{i} '.mat'];
   if ~exist(cache_file, 'file')
     th = tic();
-    im = imread(sprintf(VOCopts.imgpath, ids{i}));  
-    pyra = cnn_feat_pyramid(im, model, padx, pady);
+    im = imread(sprintf(VOCopts.imgpath, ids{i}));
+    pyra = deep_pyramid(im, model.cnn);
     fprintf('  [pyra:   %.3fs]\n', toc(th));
     th = tic();
     save(cache_file, 'pyra');
@@ -33,9 +31,9 @@ for i = 1:length(ids)
     cache_file = [outdir '/VOC' year '/' ids{i} '_flipped.mat'];
     if ~exist(cache_file, 'file')
       th = tic();
-      im = imread(sprintf(VOCopts.imgpath, ids{i}));  
+      im = imread(sprintf(VOCopts.imgpath, ids{i}));
       im = im(:, end:-1:1, :);
-      pyra = cnn_feat_pyramid(im, model, padx, pady);
+      pyra = deep_pyramid(im, model.cnn);
       fprintf('  [pyra (flipped):   %.3fs]\n', toc(th));
       th = tic();
       save(cache_file, 'pyra');

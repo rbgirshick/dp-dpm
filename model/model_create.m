@@ -59,24 +59,19 @@ m.stats.pos_latent_time    = [];  % time spent in inference on positives
 m.stats.filter_usage       = [];  % foreground training instances / filter
 
 cnn_binary_file = './data/caffe_nets/ilsvrc_2012_train_iter_310k';
-cnn_definition_file = './model-defs/rcnn_batch_7_output_pool5_plane2k.prototxt';
+cnn_definition_file = './model-defs/pyramid_cnn_output_max5_scales_7_plane_1713.prototxt';
 
 cnn.binary_file = cnn_binary_file;
 cnn.definition_file = cnn_definition_file;
 cnn.batch_size = 256;
 cnn.init_key = -1;
-cnn.input_size = 227;
-% load the ilsvrc image mean
-data_mean_file = './external/caffe/matlab/caffe/ilsvrc_2012_mean.mat';
-assert(exist(data_mean_file, 'file') ~= 0);
-ld = load(data_mean_file);
-image_mean = ld.image_mean; clear ld;
-off = floor((size(image_mean,1) - cnn.input_size)/2)+1;
-image_mean = image_mean(off:off+cnn.input_size-1, off:off+cnn.input_size-1, :);
-cnn.image_mean = image_mean;
-mu = cnn.image_mean;
-mu = sum(sum(mu, 1), 2) / size(mu, 1) / size(mu, 2);
-cnn.mu = mu;
+cnn.mu = get_channelwise_mean();
+cnn.pyra.dimx = 1713;
+cnn.pyra.dimy = 1713;
+cnn.pyra.stride = 16;
+cnn.pyra.num_levels = 7;
+cnn.pyra.num_channels = 256;
+cnn.pyra.scale_factor = sqrt(2);
 
 if init_caffe
   cnn.init_key = ...
@@ -86,3 +81,18 @@ if init_caffe
 end
 
 m.cnn = cnn;
+
+% ------------------------------------------------------------------------
+function mu = get_channelwise_mean()
+% ------------------------------------------------------------------------
+% load the ilsvrc image mean
+data_mean_file = './external/caffe/matlab/caffe/ilsvrc_2012_mean.mat';
+assert(exist(data_mean_file, 'file') ~= 0);
+% input size business isn't likley necessary, but we're doing it
+% to be consistent with previous experiments
+ld = load(data_mean_file);
+mu = ld.image_mean; clear ld;
+input_size = 227;
+off = floor((size(mu,1) - input_size)/2)+1;
+mu = mu(off:off+input_size-1, off:off+input_size-1, :);
+mu = sum(sum(mu, 1), 2) / size(mu, 1) / size(mu, 2);
