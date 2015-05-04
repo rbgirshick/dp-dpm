@@ -1,0 +1,3 @@
+[submodule "DeepPyramid"]
+	path = DeepPyramid
+	url = https://github.com/rbgirshick/DeepPyramid.git
