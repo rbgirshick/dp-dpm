@@ -6,6 +6,7 @@ The DeepPyramid DPM repository is code for our CVPR 2015 paper
 [Deformable Part Models are Convolutional Neural Networks](http://www.cs.berkeley.edu/~rbg/papers/cvpr15/dpdpm.pdf).
 This work was completed while Ross Girshick was a postdoc at UC Berkeley (prior
 to joining Microsoft Research).
+It implements Latent SVM training of deformable part models (DPMs) on top of deep feature pyramids.
 
     @inproceedings{girshick2015dpdpm,
         Author    = {Ross Girshick and Forrest Iandola and
@@ -17,15 +18,15 @@ to joining Microsoft Research).
         Year      = {2015}
     }
 
-It implements Latent SVM training of deformable part models (DPMs) on top of deep feature pyramids.
-
 ### License
 
-Deep Pyramid DPM is released under the simplified BSD license (refer to the LICENSE file for details).
+Deep Pyramid DPM is released under the MIT License (refer to the LICENSE file for details).
+Substantial parts of the code come from [DPMv5](https://github.com/rbgirshick/voc-dpm), which
+is also under the MIT License (see COPYING.DPMv5 for details).
 
 ### Requirements: software
 
-1. Requirements for `Caffe` and `pycaffe` (see: [Caffe installation instructions](http://caffe.berkeleyvision.org/installation.html))
+1. Requirements for `Caffe` and `matcaffe` (see: [Caffe installation instructions](http://caffe.berkeleyvision.org/installation.html))
 
   You can download my [Makefile.config](http://www.cs.berkeley.edu/~rbg/dp-dpm-data/Makefile.config) for reference.
 2. MATLAB (tested on R2014a)
@@ -56,7 +57,7 @@ A good GPU, such as a GTX Titan, K20, etc.
     # Replace 8 with your favorite number of compile threads
     ```
 
-4. Download pre-computed ImageNet model
+4. Download the pre-computed ImageNet model
     ```Shell
     cd $DPDPM_ROOT
     ./data/scripts/fetch_imagenet_model.sh
@@ -65,6 +66,9 @@ A good GPU, such as a GTX Titan, K20, etc.
     This will populate the `$DPDPM_ROOT/data/caffe_nets` folder with `CaffeNet.v2.caffemodel`.
 
 5. Symlink to the PASCAL VOC 2007 dataset
+
+    Note: for more information on installing VOC 2007, go [here](https://github.com/rbgirshick/rcnn#installing-pascal-voc-2007).
+
     ```Shell
     cd $DPDPM_ROOT
     # Replace /path/to with the actual path to VOC 2007
@@ -83,10 +87,10 @@ A good GPU, such as a GTX Titan, K20, etc.
 To train and test a detector:
 
 ```Shell
-cd $DPDP_ROOT
+cd $DPDPM_ROOT
 matlab
 >> % run these commands inside matlab
->> precompute_feat_pyramids() % this is take several hours
+>> precompute_feat_pyramids() % this will take several hours
 >> pascal('bicycle', 3) % replace 'bicycle' with any PASCAL class
 ```
 
