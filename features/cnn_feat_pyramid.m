@@ -5,7 +5,11 @@ if ~exist('padx', 'var') || isempty(padx) || ...
   [padx, pady] = getpadding(model);
 end
 
-cache_opts.cache_file = ['/data/caches/dp-dpm/VOC2007/' image_id '.mat'];
+if exist('image_id', 'var') || ~isempty(image_id)
+  cache_dir = get_feat_cache_dir();
+  cache_opts.cache_file = [cache_dir '/' image_id '.mat'];
+  cache_opts.write_on_miss = true;
+end
 cache_opts.debug = false;
 pyra = deep_pyramid_cache_wrapper(im, model.cnn, cache_opts);
 pyra = deep_pyramid_add_padding(pyra, padx, pady, false);

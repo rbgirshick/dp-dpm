@@ -5,16 +5,15 @@ if ~exist('use_gpu', 'var') || isempty(use_gpu)
 end
 
 if ~exist('use_caffe', 'var') || isempty(use_caffe)
-  use_caffe = false;
+  use_caffe = true;
 end
 
 if use_caffe
   m.cnn.init_key = ...
-      caffe('init', m.cnn.definition_file, m.cnn.binary_file);
+      caffe('init', m.cnn.definition_file, m.cnn.binary_file, 'test');
   if use_gpu
     caffe('set_mode_gpu');
   else
     caffe('set_mode_cpu');
   end
-  caffe('set_phase_test');
 end

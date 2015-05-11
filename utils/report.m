@@ -27,7 +27,7 @@ count1 = 0;
 for i=1:length(conf.pascal.VOCopts.classes)
   cls = conf.pascal.VOCopts.classes{i};
   try
-    load([dir1 cls suffix1]);
+    load([dir1 cls suffix1], '-mat');
     ap1 = ap;
     if do_auc_ap 
       ap2 = xVOCap(recall, prec);

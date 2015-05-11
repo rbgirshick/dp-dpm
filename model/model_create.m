@@ -1,4 +1,4 @@
-function m = model_create(cls, note, init_caffe)
+function m = model_create(cls, note)
 % Create an empty object model.
 %   m = model_create(cls, note)
 %
@@ -25,10 +25,6 @@ conf = voc_config();
 
 if ~exist('note', 'var') || isempty(note)
   note = '';
-end
-
-if ~exist('init_caffe', 'var') || isempty(init_caffe)
-  init_caffe = false;
 end
 
 m.class         = cls;                % object class/category
@@ -73,20 +69,13 @@ cnn.pyra.num_levels = 7;
 cnn.pyra.num_channels = 256;
 cnn.pyra.scale_factor = sqrt(2);
 
-if init_caffe
-  cnn.init_key = ...
-      caffe('init', cnn.definition_file, cnn.binary_file);
-  caffe('set_mode_gpu');
-  caffe('set_phase_test');
-end
-
 m.cnn = cnn;
 
 % ------------------------------------------------------------------------
 function mu = get_channelwise_mean()
 % ------------------------------------------------------------------------
 % load the ilsvrc image mean
-data_mean_file = './external/caffe/matlab/caffe/ilsvrc_2012_mean.mat';
+data_mean_file = 'caffe/matlab/caffe/ilsvrc_2012_mean.mat';
 assert(exist(data_mean_file, 'file') ~= 0);
 % input size business isn't likley necessary, but we're doing it
 % to be consistent with previous experiments

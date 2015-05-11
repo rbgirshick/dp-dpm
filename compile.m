@@ -39,8 +39,6 @@ end
 if nargin < 3
   % Build feature vector cache code
   fv_compile(opt, verb);
-  % Build the star-cascade code
-  cascade_compile(opt, verb);
 
   eval([mexcmd(opt, verb) ' features/resize.cc']);
   eval([mexcmd(opt, verb) ' features/features.cc']);
