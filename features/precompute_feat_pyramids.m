@@ -1,5 +1,4 @@
-function cache_cnn_feat_pyramid()
-% cache_cnn_feat_pyramid('2007', '/data/caches/dp-dpm');
+function precompute_feat_pyramids()
 
 conf = voc_config();
 VOCopts  = conf.pascal.VOCopts;

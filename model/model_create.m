@@ -54,7 +54,7 @@ m.stats.data_mining_time   = [];  % time spent in data mining
 m.stats.pos_latent_time    = [];  % time spent in inference on positives
 m.stats.filter_usage       = [];  % foreground training instances / filter
 
-cnn_binary_file = './data/caffe_nets/ilsvrc_2012_train_iter_310k';
+cnn_binary_file = './data/caffe_nets/CaffeNet.v2.caffemodel';
 cnn_definition_file = './model-defs/pyramid_cnn_output_max5_scales_7_plane_1713.prototxt';
 
 cnn.binary_file = cnn_binary_file;

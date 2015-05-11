@@ -40,7 +40,7 @@ PASCAL_YEAR = '2007';
 
 % Models are stored in BASE_DIR/PROJECT/PASCAL_YEAR/
 % e.g., /var/tmp/rbg/voc-release5/2007/
-PROJECT     = 'dpm-cnn-features/mix_3_neg_pos_ovr_30';
+PROJECT     = 'dp-dpm';
 
 % The code will look for your PASCAL VOC devkit in 
 % BASE_DIR/VOC<PASCAL_YEAR>/VOCdevkit
