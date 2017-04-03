@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../caffe_nets/" && pwd )"
 cd $DIR
 
 FILE=CaffeNet.v2.caffemodel
-URL=http://www.cs.berkeley.edu/~rbg/dp-dpm-data/$FILE
+URL=https://dl.dropboxusercontent.com/s/t1z4jxj991x968x/CaffeNet.v2.caffemodel
 CHECKSUM=6e47b642e2f261090c8fecdc05a57546
 
 if [ -f $FILE ]; then

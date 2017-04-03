@@ -3,7 +3,7 @@
 ### Introduction
 
 The DeepPyramid DPM repository is code for our CVPR 2015 paper
-[Deformable Part Models are Convolutional Neural Networks](http://www.cs.berkeley.edu/~rbg/papers/cvpr15/dpdpm.pdf).
+[Deformable Part Models are Convolutional Neural Networks](http://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Girshick_Deformable_Part_Models_2015_CVPR_paper.pdf).
 This work was completed while Ross Girshick was a postdoc at UC Berkeley (prior
 to joining Microsoft Research).
 It implements Latent SVM training of deformable part models (DPMs) on top of deep feature pyramids.
@@ -28,7 +28,7 @@ is also under the MIT License (see COPYING.DPMv5 for details).
 
 1. Requirements for `Caffe` and `matcaffe` (see: [Caffe installation instructions](http://caffe.berkeleyvision.org/installation.html))
 
-  You can download my [Makefile.config](http://www.cs.berkeley.edu/~rbg/dp-dpm-data/Makefile.config) for reference.
+  You can download my [Makefile.config](https://dl.dropboxusercontent.com/s/ot5fsofppjmo1wv/Makefile.config) for reference.
 2. MATLAB (tested on R2014a)
 
 ### Requirements: hardware
